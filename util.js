@@ -11,6 +11,7 @@ exports.getProblem = (year, fileName, parse=getStrings) => {
 exports.sum = arr => arr.reduce((s, n) => s + n);
 exports.min = arr => arr.reduce((m, n) => n < m ? n : m);
 exports.max = arr => arr.reduce((m, n) => n > m ? n : m);
+exports.within = (val, min, max) => val >= min && val <= max;
 
 exports.binarySearch = (arr, val) => {
   const search = (left, right) => {
