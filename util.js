@@ -24,3 +24,8 @@ exports.binarySearch = (arr, val) => {
 
   return search(0, arr.length - 1);
 }
+
+exports.replace = (arr, i, val) => {
+  const getter = (typeof val === "function") ? val : () => val;
+  return [ ...arr.slice(0, i), getter(arr[i], arr, i), ...arr.slice(i + 1) ];
+}
