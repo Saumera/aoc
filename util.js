@@ -1,9 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 
-const { getString: DEFAULT_PARSE } = require('./parsers.js');
+const { getStrings } = require('./parsers.js');
 
-exports.getProblem = (year, fileName, parse=DEFAULT_PARSE) => {
+exports.getProblem = (year, fileName, parse=getStrings) => {
   const contents = fs.readFileSync(path.resolve(__dirname, year, 'problems', fileName)).toString();
   return parse(contents);
 }
