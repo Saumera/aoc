@@ -11,3 +11,15 @@ exports.getProblem = (year, fileName, parse=DEFAULT_PARSE) => {
 exports.sum = arr => arr.reduce((s, n) => s + n);
 exports.min = arr => arr.reduce((m, n) => n < m ? n : m);
 exports.max = arr => arr.reduce((m, n) => n > m ? n : m);
+
+exports.binarySearch = (arr, val) => {
+  const search = (left, right) => {
+    if (left > right) return null;
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid] === val) return val;
+    if (arr[mid] < val) return search(mid + 1, right);
+    return search(left, mid - 1);
+  }
+
+  return search(0, arr.length - 1);
+}
