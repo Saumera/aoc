@@ -41,23 +41,20 @@ const part1 = () => {
 
 const part2 = () => {
   // TRIG
-  const turnToRad = (dir, deg) => ((dir === "L" ? -1 : 1) * deg * Math.PI / 180);
-  const rotate = (waypoint, dir, deg) => {
-    const rad = turnToRad(dir, deg);
-    return {
-      x: Math.round(waypoint.x * Math.cos(rad)      + waypoint.y * Math.sin(rad)),
-      y: Math.round(waypoint.x * -1 * Math.sin(rad) + waypoint.y * Math.cos(rad))
-    }
-  }
+  const rotate = (waypoint, rad) => ({
+    x: Math.round(waypoint.x * Math.cos(rad)      + waypoint.y * Math.sin(rad)),
+    y: Math.round(waypoint.x * -1 * Math.sin(rad) + waypoint.y * Math.cos(rad))
+  })
 
   // All actions except for F take in and return the waypoint
+  const degToRad = (deg) => deg * Math.PI / 180;
   const actions = {
     N: ({ x, y }, dist) => ({ x, y: y + dist }),
     S: ({ x, y }, dist) => ({ x, y: y - dist }),
     E: ({ x, y }, dist) => ({ x: x + dist, y }),
     W: ({ x, y }, dist) => ({ x: x - dist, y }),
-    L: (waypoint, deg) => rotate(waypoint, "L", deg),
-    R: (waypoint, deg) => rotate(waypoint, "R", deg),
+    L: (waypoint, deg) => rotate(waypoint, degToRad(deg * -1)),
+    R: (waypoint, deg) => rotate(waypoint, degToRad(deg)),
     F: ({ x, y, waypoint }, value) => ({
       x: x + (waypoint.x * value),
       y: y + (waypoint.y * value),
