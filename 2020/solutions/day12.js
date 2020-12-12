@@ -11,10 +11,10 @@ const instructions = getProblem('2020', 'day12.txt', parse);
 
 const part1 = () => {
   const compassActions = {
-    N: ({ x, y, bearing }, dist) => ({ x, y: y + dist, bearing }),
-    S: ({ x, y, bearing }, dist) => ({ x, y: y - dist, bearing }),
-    E: ({ x, y, bearing }, dist) => ({ x: x + dist, y, bearing }),
-    W: ({ x, y, bearing }, dist) => ({ x: x - dist, y, bearing }),
+    N: (s, dist) => ({ ...s, y: s.y + dist }),
+    S: (s, dist) => ({ ...s, y: s.y - dist }),
+    E: (s, dist) => ({ ...s, x: s.x + dist }),
+    W: (s, dist) => ({ ...s, x: s.x - dist }),
   }
 
   // Bearing will be an int from 0 to 3 where 0 is North and it goes clockwise until 3 is West
@@ -24,9 +24,9 @@ const part1 = () => {
   const getBearing = (b, d) => (b + 4 + (d / 90)) % 4;
 
   const turnActions = {
-    L: ({ x, y, bearing }, degrees) => ({ x, y, bearing: getBearing(bearing, degrees * -1) }),
-    R: ({ x, y, bearing }, degrees) => ({ x, y, bearing: getBearing(bearing, degrees) }),
-    F: ({ x, y, bearing }, dist) => compassActions[bearingToDir[bearing]]({ x, y, bearing }, dist)
+    L: (s, degrees) => ({ ...s, bearing: getBearing(s.bearing, degrees * -1) }),
+    R: (s, degrees) => ({ ...s, bearing: getBearing(s.bearing, degrees) }),
+    F: (s, dist) => compassActions[bearingToDir[s.bearing]](s, dist)
   }
 
   const actions = { ...compassActions, ...turnActions };
@@ -40,15 +40,15 @@ const part1 = () => {
 }
 
 const part2 = () => {
-  const turnLookup = {
-    R270: ({ x, y }) => ({ x: y * -1, y: x }),
-    L90:  ({ x, y }) => ({ x: y * -1, y: x }),
-    L270: ({ x, y }) => ({ x: y, y: x * -1 }),
-    R90:  ({ x, y }) => ({ x: y, y: x * -1 }),
-    L180: ({ x, y }) => ({ x: x * -1, y: y * -1 }),
-    R180: ({ x, y }) => ({ x: x * -1, y: y * -1 }),
-  };
-  const turn = (type, waypoint) => turnLookup[type](waypoint);
+  // TRIG
+  const turnToRad = (dir, deg) => ((dir === "L" ? -1 : 1) * deg * Math.PI / 180);
+  const rotate = (waypoint, dir, deg) => {
+    const rad = turnToRad(dir, deg);
+    return {
+      x: Math.round(waypoint.x * Math.cos(rad)      + waypoint.y * Math.sin(rad)),
+      y: Math.round(waypoint.x * -1 * Math.sin(rad) + waypoint.y * Math.cos(rad))
+    }
+  }
 
   // All actions except for F take in and return the waypoint
   const actions = {
@@ -56,8 +56,8 @@ const part2 = () => {
     S: ({ x, y }, dist) => ({ x, y: y - dist }),
     E: ({ x, y }, dist) => ({ x: x + dist, y }),
     W: ({ x, y }, dist) => ({ x: x - dist, y }),
-    L: (waypoint, deg) => turn(`L${deg}`, waypoint),
-    R: (waypoint, deg) => turn(`R${deg}`, waypoint),
+    L: (waypoint, deg) => rotate(waypoint, "L", deg),
+    R: (waypoint, deg) => rotate(waypoint, "R", deg),
     F: ({ x, y, waypoint }, value) => ({
       x: x + (waypoint.x * value),
       y: y + (waypoint.y * value),
