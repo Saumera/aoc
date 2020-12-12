@@ -31,29 +31,15 @@ const part1 = () => {
 
   const actions = { ...compassActions, ...turnActions };
 
-  // Part 1:
   const INIT = { x: 0, y: 0, bearing: 1 };
-  const processStep = (i, state = INIT) => {
-    const step = instructions[i];
-    if (!step) return state;
-    const { action, value } = step;
-    const newState = actions[action](state, value);
-    return processStep(i + 1, newState);
-  }
+  const finalState = instructions.reduce((state, { action, value }) => {
+    return actions[action](state, value)
+  }, INIT);
 
-  const finalState = processStep(0);
   return Math.abs(finalState.x) + Math.abs(finalState.y);
 }
 
 const part2 = () => {
-  // These results represent changes to the waypoints
-  const compassActions = {
-    N: ({ x, y }, dist) => ({ x, y: y + dist }),
-    S: ({ x, y }, dist) => ({ x, y: y - dist }),
-    E: ({ x, y }, dist) => ({ x: x + dist, y }),
-    W: ({ x, y }, dist) => ({ x: x - dist, y }),
-  }
-
   const turnLookup = {
     R270: ({ x, y }) => ({ x: y * -1, y: x }),
     L90:  ({ x, y }) => ({ x: y * -1, y: x }),
@@ -64,7 +50,12 @@ const part2 = () => {
   };
   const turn = (type, waypoint) => turnLookup[type](waypoint);
 
-  const turnActions = {
+  // All actions except for F take in and return the waypoint
+  const actions = {
+    N: ({ x, y }, dist) => ({ x, y: y + dist }),
+    S: ({ x, y }, dist) => ({ x, y: y - dist }),
+    E: ({ x, y }, dist) => ({ x: x + dist, y }),
+    W: ({ x, y }, dist) => ({ x: x - dist, y }),
     L: (waypoint, deg) => turn(`L${deg}`, waypoint),
     R: (waypoint, deg) => turn(`R${deg}`, waypoint),
     F: ({ x, y, waypoint }, value) => ({
@@ -74,23 +65,16 @@ const part2 = () => {
     })
   };
 
-  const actions = { ...compassActions, ...turnActions }
-
   const INIT = { x: 0, y: 0, waypoint: { x: 10, y: 1 } };
-  const processStep = (i, state = INIT) => {
-    const step = instructions[i];
-    if (!step) return state;
-    const { action, value } = step;
+  const finalState = instructions.reduce((state, { action, value }) => {
     // Every action except the F action operates solely on the waypoint,
     // so this will confine the state update in all those cases to just the
     // waypoint
-    const newState = action === "F"
+    return action === "F"
       ? actions[action](state, value)
       : { ...state, waypoint: actions[action](state.waypoint, value) }
-    return processStep(i + 1, newState);
-  }
+  }, INIT);
 
-  const finalState = processStep(0);
   return Math.abs(finalState.x) + Math.abs(finalState.y)
 }
 
