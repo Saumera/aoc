@@ -8,7 +8,7 @@ exports.getProblem = (year, fileName, parse=getStrings) => {
   return parse(contents);
 }
 
-exports.sum = arr => arr.reduce((s, n) => s + n);
+exports.sum = arr => arr.reduce((s, n) => s + n, 0);
 exports.min = arr => arr.reduce((m, n) => n < m ? n : m);
 exports.max = arr => arr.reduce((m, n) => n > m ? n : m);
 exports.within = (val, min, max) => val >= min && val <= max;
