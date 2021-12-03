@@ -1,11 +1,11 @@
-const { getProblem } = require('../../util.js');
+const { getProblem } = require('../helpers.js');
 
 const parse = contents => contents.split(/\n/gi)
   .filter(Boolean)
   .map(line => line.split(' '))
   .map(step => ({ direction: step[0], amount: Number(step[1]) }))
 
-const steps = getProblem('2021', 'day2.txt', parse);
+const steps = getProblem(2, parse);
 
 const part1 = (() => {
   const stepsByDirection = {

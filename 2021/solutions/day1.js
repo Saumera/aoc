@@ -1,7 +1,7 @@
-const { getProblem } = require('../../util.js');
+const { getProblem } = require('../helpers.js');
 const { getNumbers } = require('../../parsers.js');
 
-const numbers = getProblem('2021', 'day1.txt', getNumbers);
+const numbers = getProblem(1, getNumbers);
 
 // Part 1
 const part1 = numbers.reduce((total, n, i) => {
