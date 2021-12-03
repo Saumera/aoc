@@ -1,6 +1,5 @@
 const { getProblem } = require('../../util.js');
 
-const regex = /^(?<direction>[a-z]+) ?(<amount>[0-9]+)$/;
 const parse = contents => contents.split(/\n/gi)
   .filter(Boolean)
   .map(line => line.split(' '))
