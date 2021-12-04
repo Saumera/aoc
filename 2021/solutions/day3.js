@@ -1,40 +1,39 @@
 const { getProblem } = require('../helpers.js');
 
-const numbers = getProblem(3);
+const numStrings = getProblem(3)
+const numbers = numStrings.map(n => parseInt(n, 2));
+const numBits = [ ...new Array(numStrings[0].length) ].map((_, i) => i);
 
-const gamma = numbers[0].split('').reduce((str, number, i) => {
-  const bits = numbers.map(l => l[i]);
-  const map = { 0: 0, 1: 0 };
-  bits.forEach(b => map[b] = map[b] + 1);
-  return str + (map[0] > map[1] ? "0" : "1")
-}, '');
-const epsilon = gamma.split("").map(b => b === "0" ? "1" : "0").join('');
+const getBit = (n, bit) => (n & (1 << bit)) >> bit;
+const flipBit = val => (val + 1) % 2;
+const getBitCounts = (nums, i) => {
+  const counts = { 0: 0, 1: 0 }
+  nums.map(n => getBit(n, i)).forEach(n => counts[n]++)
+  return counts;
+}
+
+const gamma = numBits
+  .map(bit => getBitCounts(numbers, bit))
+  .reduce((num, counts, i) => num | (parseInt(counts[1] / counts[0])) << i, 0)
+const epsilon = numBits.reduce((num, i) => num | (flipBit(getBit(gamma, i)) << i), 0)
 
 // Part 1
-const part1 = (() => {
-  return parseInt(gamma, 2) * parseInt(epsilon, 2);
-})()
+const part1 = gamma * epsilon
 
 // Part2
 const part2 = (() => {
-  const getVal = operation => {
-    let filtered = numbers;
-    let bit = 0;
-    while (filtered.length > 1) {
-      const map = { 0: 0, 1: 0 };
-      filtered.forEach(line => map[line[bit]] = map[line[bit]] + 1)
-      const target = operation === "gt"
-        ? (map[0] > map[1] ? "0" : "1")
-        : (map[0] <= map[1] ? "0" : "1");
-      filtered = filtered.filter(line => line[bit] === target);
-      bit++;
-    }
-    return filtered[0];
+  const getVal = (operation, bit=numStrings[0].length - 1, candidates=numbers) => {
+    if (candidates.length === 1) return candidates[0];
+    const counts = getBitCounts(candidates, bit);
+    const target = operation === "gt"
+      ? (counts[0] > counts[1] ? 0 : 1)
+      : (counts[0] <= counts[1] ? 0 : 1);
+    return getVal(operation, bit - 1, candidates.filter(n => getBit(n, bit) === target));
   }
 
   const oxygen = getVal("gt");
   const co2 = getVal("lt");
-  return parseInt(oxygen, 2) * parseInt(co2, 2);
+  return oxygen * co2
 })()
 
 console.log(part1);
