@@ -10,6 +10,10 @@ const boards = rawBoards.map(b => {
     .map(l => l.split(' ').filter(Boolean).map(Number))
 })
 
+// used to enumerate all [i, j] pairs
+const rowLen = boards[0][0].length;
+const coords = [].concat(...boards[0]).map((_, i) => ([parseInt(i / rowLen), i % rowLen]));
+
 const MARKED = -1;
 const isMarked = v => v === MARKED;
 const markValue = (board, i, j) => [
@@ -18,11 +22,7 @@ const markValue = (board, i, j) => [
   ...board.slice(i + 1)
 ]
 const checkPos = (b, i, j, val) => b[i][j] === val ? markValue(b, i, j) : b;
-const checkBoard = (board, val) => {
-  const rowLen = board[0].length;
-  const coords = [].concat(...board).map((_, i) => ([parseInt(i / rowLen), i % rowLen]));
-  return coords.reduce((b, [i, j]) => checkPos(b, i, j, val), board);
-}
+const updateBoard = (board, val) => coords.reduce((b, [i, j]) => checkPos(b, i, j, val), board);
 
 const checkRow = row => row.every(isMarked)
 const checkCol = (board, col) => board.map(r => r[col]).every(isMarked)
@@ -31,10 +31,10 @@ const isBingo = board => board.some(checkRow) || board[0].some((_, col) => check
 const getSum = board => [].concat(...board).filter(v => !isMarked(v)).reduce((sum, v) => sum + v);
 
 const part1 = (() => {
-  const drawNumbers = (draws, allBoards) => {
-    const [num, ...remaining] = draws;
-    const updatedBoards = allBoards.map(b => checkBoard(b, num));
-    const found = updatedBoards.find(b => isBingo(b));
+  const drawNumbers = (numbers, allBoards) => {
+    const [num, ...remaining] = numbers;
+    const updatedBoards = allBoards.map(b => updateBoard(b, num));
+    const found = updatedBoards.find(isBingo);
     if (found) return getSum(found) * num;
     return drawNumbers(remaining, updatedBoards);
   }
@@ -43,17 +43,17 @@ const part1 = (() => {
 })()
 
 const part2 = (() => {
-  const getLastBingo = (board, draws) => {
-    const [num, ...remaining] = draws;
-    const updated = checkBoard(board, num);
+  const getLastBingo = (board, numbers) => {
+    const [num, ...remaining] = numbers;
+    const updated = updateBoard(board, num);
     if (isBingo(updated)) return getSum(updated) * num;
     return getLastBingo(updated, remaining);
   }
 
-  const getLastBoard = (draws, remainingBoards) => {
-    const [num, ...remaining] = draws;
+  const getLastBoard = (numbers, remainingBoards) => {
+    const [num, ...remaining] = numbers;
     const updatedBoards = remainingBoards
-      .map(b => checkBoard(b, num))
+      .map(b => updateBoard(b, num))
       .filter(b => !isBingo(b));
     if (updatedBoards.length === 1) return getLastBingo(updatedBoards[0], remaining)
     return getLastBoard(remaining, updatedBoards);
