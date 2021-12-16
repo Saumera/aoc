@@ -4,7 +4,8 @@ const getStr = (i, j) => `${i},${j}`
 const setRisk = (map, i, j, v) => map[getStr(i, j)] = Math.min((map[getStr(i,j)] ?? Infinity), v);
 const insertInPlace = (arr, v) => {
   const binSearch = (target, l=0, r=arr.length - 1) => {
-    if (l > r) return l === 0 ? l : r;
+    // If there's no matching risk, use the left index as the insertion point
+    if (l > r) return l;
     const mid = Math.floor((l + r) / 2);
     if (arr[mid][1] === target) return mid;
     return (arr[mid][1] > target)
@@ -57,7 +58,7 @@ const runDay = rawInput => {
       const tile = rawInput.map(r => r.map(v => inc(v, i)))
       return tesselateTile(tile, size)
     }).flat(1)
-    return findMinPath(input) - 1 // don't ask
+    return findMinPath(input)
   })()
 
   console.log(part1);
